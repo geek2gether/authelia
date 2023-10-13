@@ -25,7 +25,7 @@ authentication_backend:
     disable: false
   refresh_interval: 5m
   file:
-    path: /etc/authelia/.users/users_database.yml
+    path: /etc/authelia/config/users_database.yml
     password:
       algorithm: argon2id
       iterations: 1
