@@ -1,0 +1,86 @@
+################################################################
+#       Sample  Authelia configuration                    #
+###############################################################
+theme: dark
+default_redirection_url: https://geek2gether.com/
+
+server:
+  host: 0.0.0.0
+  port: 9091
+  disable_healthcheck: false
+
+log:
+  level: debug
+  format: text
+  file_path: "/var/log/authelia.log"
+  keep_stdout: false
+
+totp:
+  issuer: geek2gether.com
+  period: 30
+  skew: 1
+
+authentication_backend:
+  password_reset:
+    disable: false
+  refresh_interval: 5m
+  file:
+    path: /etc/authelia/.users/users_database.yml
+    password:
+      algorithm: argon2id
+      iterations: 1
+      key_length: 32
+      salt_length: 16
+      memory: 1024
+      parallelism: 8
+
+access_control:
+  default_policy: deny
+  rules:
+    ## bypass rule
+    - domain: 
+        - "auth.geek2gether.com"
+      policy: bypass
+    ## catch-all
+    - domain:
+        - "*.geek2gether.com"
+      subject: 
+        - "group:admins"
+      policy: one_factor
+
+session:
+  name: authelia_session
+  domain: geek2gether.com
+  same_site: lax
+  expiration: 1h
+  inactivity: 5m
+  remember_me_duration: 2M
+
+regulation:
+  max_retries: 3
+  find_time: 10m
+  ban_time: 12h
+
+storage:
+  mysql:
+    host: 127.0.0.1
+    port: 3306
+    database: authelia
+    username: authelia
+
+notifier:
+  disable_startup_check: true
+  smtp:
+    username: YOUR@EMAIL.HERE
+    password: "YOUR_EMAIL_PASSWORD"
+    host: YOUR_SMTP_HOST
+    port: 587
+    sender: YOUR@EMAIL.HERE
+    identifier: localhost
+    subject: "[Authelia] {title}"
+    startup_check_address: test@authelia.com
+    disable_require_tls: false
+    disable_html_emails: false
+    tls:
+      skip_verify: false
+      minimum_version: TLS1.2
